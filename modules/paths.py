@@ -2,6 +2,7 @@ import os
 import sys
 import modules.paths_internal
 
+
 data_path = modules.paths_internal.data_path
 script_path = modules.paths_internal.script_path
 models_path = modules.paths_internal.models_path
@@ -35,7 +36,7 @@ path_dirs = [
 
 paths = {}
 
-for d, must_exist, what, options in path_dirs:
+for d, must_exist, what, _options in path_dirs:
     must_exist_path = os.path.abspath(os.path.join(script_path, d, must_exist))
     if not os.path.exists(must_exist_path):
         print(f"Warning: {what} not found at path {must_exist_path}", file=sys.stderr)
@@ -56,8 +57,7 @@ def create_paths(opts):
         if not os.path.exists(folder):
             try:
                 os.makedirs(folder, exist_ok=True)
-                # print('Creating folder:', folder)
-            except:
+            except Exception:
                 pass
 
     def fix_path(folder):
