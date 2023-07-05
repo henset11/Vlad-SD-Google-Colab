@@ -1,12 +1,19 @@
-/* global gradioApp, onUiUpdate, opts */
-
 window.opts = {};
 window.localization = {};
+window.titles = {};
 let tabSelected = '';
 
 function set_theme(theme) {
   const gradioURL = window.location.href;
   if (!gradioURL.includes('?__theme=')) window.location.replace(`${gradioURL}?__theme=${theme}`);
+}
+
+function clip_gallery_urls(gallery) {
+  const files = gallery.map((v) => v.data);
+  navigator.clipboard.writeText(JSON.stringify(files)).then(
+    () => console.log('clipboard set:', files),
+    (err) => console.log('clipboard error:', files, err)
+  );
 }
 
 function all_gallery_buttons() {
@@ -43,15 +50,11 @@ function extract_image_from_gallery(gallery) {
   return [gallery[index]];
 }
 
-function args_to_array(args) {
-  const res = [];
-  for (let i = 0; i < args.length; i++) res.push(args[i]);
-  return res;
-}
+window.args_to_array = Array.from; // Compatibility with e.g. extensions that may expect this to be around
 
 function switch_to_txt2img(...args) {
   gradioApp().querySelector('#tabs').querySelectorAll('button')[0].click();
-  return args_to_array(args);
+  return Array.from(arguments);
 }
 
 function switch_to_img2img_tab(no) {
@@ -61,27 +64,27 @@ function switch_to_img2img_tab(no) {
 
 function switch_to_img2img(...args) {
   switch_to_img2img_tab(0);
-  return args_to_array(args);
+  return Array.from(arguments);
 }
 
 function switch_to_sketch(...args) {
   switch_to_img2img_tab(1);
-  return args_to_array(args);
+  return Array.from(arguments);
 }
 
 function switch_to_inpaint(...args) {
   switch_to_img2img_tab(2);
-  return args_to_array(args);
+  return Array.from(arguments);
 }
 
 function switch_to_inpaint_sketch(...args) {
   switch_to_img2img_tab(3);
-  return args_to_array(args);
+  return Array.from(arguments);
 }
 
 function switch_to_extras(...args) {
   gradioApp().querySelector('#tabs').querySelectorAll('button')[2].click();
-  return args_to_array(args);
+  return Array.from(arguments);
 }
 
 function get_tab_index(tabId) {
@@ -94,22 +97,20 @@ function get_tab_index(tabId) {
 }
 
 function create_tab_index_args(tabId, args) {
-  const res = [];
-  for (let i = 0; i < args.length; i++) res.push(args[i]);
+  let res = Array.from(args);
   res[0] = get_tab_index(tabId);
   return res;
 }
 
 function get_img2img_tab_index(...args) {
-  const res = args_to_array(args);
+  let res = Array.from(arguments);
   res.splice(-2);
   res[0] = get_tab_index('mode_img2img');
   return res;
 }
 
 function create_submit_args(args) {
-  const res = [];
-  for (let i = 0; i < args.length; i++) res.push(args[i]);
+  var res = Array.from(args);
   // As it is currently, txt2img and img2img send back the previous output args (txt2img_gallery, generation_info, html_info) whenever you generate a new image.
   // This can lead to uploading a huge gallery of previously generated images, which leads to an unnecessary delay between submitting and beginning to generate.
   // I don't know why gradio is sending outputs along with inputs, but we can prevent sending the image gallery here, which seems to be an issue for some.
@@ -118,39 +119,48 @@ function create_submit_args(args) {
   return res;
 }
 
-function showSubmitButtons(tabname, show) {
-  gradioApp().getElementById(`${tabname}_interrupt`).style.display = show ? 'none' : 'block';
-  gradioApp().getElementById(`${tabname}_skip`).style.display = show ? 'none' : 'block';
-  // gradioApp().getElementById(tabname+'_interrupt').style.display = "block"
-  // gradioApp().getElementById(tabname+'_skip').style.display = "block"
+function showSubmitButtons(tabname, show) {}
+
+function clearGallery(tabname) {
+  const gallery = gradioApp().getElementById(`${tabname}_gallery`)
+  gallery.classList.remove('logo');
+  // gallery.style.height = window.innerHeight - gallery.getBoundingClientRect().top - 200 + 'px'
+  const footer = gradioApp().getElementById(`${tabname}_footer`)
+  footer.style.display = 'flex';
 }
 
 function submit(...args) {
+  console.log('Submit txt2img');
   rememberGallerySelection('txt2img_gallery');
-  showSubmitButtons('txt2img', false);
+  clearGallery('txt2img');
   const id = randomId();
-  const atEnd = () => showSubmitButtons('txt2img', true);
-  requestProgress(id, gradioApp().getElementById('txt2img_gallery_container'), gradioApp().getElementById('txt2img_gallery'), atEnd);
+  requestProgress(id, null, gradioApp().getElementById('txt2img_gallery'));
   const res = create_submit_args(args);
   res[0] = id;
   return res;
 }
 
 function submit_img2img(...args) {
+  console.log('Submit img2img');
   rememberGallerySelection('img2img_gallery');
-  showSubmitButtons('img2img', false);
+  clearGallery('img2img');
   const id = randomId();
-  const atEnd = () => showSubmitButtons('img2img', true);
-  requestProgress(id, gradioApp().getElementById('img2img_gallery_container'), gradioApp().getElementById('img2img_gallery'), atEnd);
+  requestProgress(id, null, gradioApp().getElementById('img2img_gallery'));
   const res = create_submit_args(args);
   res[0] = id;
   res[1] = get_tab_index('mode_img2img');
   return res;
 }
 
+function submit_postprocessing(...args) {
+  console.log('Submit extras');
+  clearGallery('extras');
+  return args
+}
+
+
 function modelmerger(...args) {
   const id = randomId();
-  requestProgress(id, gradioApp().getElementById('modelmerger_results_panel'), null);
   const res = create_submit_args(args);
   res[0] = id;
   return res;
@@ -178,19 +188,19 @@ function recalculatePromptTokens(name) {
 function recalculate_prompts_txt2img(...args) {
   recalculatePromptTokens('txt2img_prompt');
   recalculatePromptTokens('txt2img_neg_prompt');
-  return args_to_array(args);
+  return Array.from(arguments);
 }
 
 function recalculate_prompts_img2img(...args) {
   recalculatePromptTokens('img2img_prompt');
   recalculatePromptTokens('img2img_neg_prompt');
-  return args_to_array(args);
+  return Array.from(arguments);
 }
 
 function recalculate_prompts_inpaint(...args) {
   recalculatePromptTokens('img2img_prompt');
   recalculatePromptTokens('img2img_neg_prompt');
-  return args_to_array(args);
+  return Array.from(arguments);
 }
 
 function register_drag_drop() {
@@ -209,7 +219,33 @@ function register_drag_drop() {
   });
 }
 
-onUiUpdate(() => {
+opts = {}
+opts_metadata = {}
+function updateOpts(json_string){
+    let settings_data = JSON.parse(json_string)
+    opts = settings_data.values
+    opts_metadata = settings_data.metadata
+    opts_tabs = {}
+    Object.entries(opts_metadata).forEach(([opt, meta]) => {
+        opts_tabs[meta.tab_name] ||= {}
+        let unsaved = (opts_tabs[meta.tab_name].unsaved_keys ||= new Set())
+        if (!meta.is_stored) unsaved.add(opt)
+    })
+}
+
+function showAllSettings() {
+  // Try to ensure that the show all settings tab is opened by clicking on its tab button
+  let tab_dirty_indicator = gradioApp().getElementById('modification_indicator_show_all_pages');
+  if (tab_dirty_indicator && tab_dirty_indicator.nextSibling) {
+    tab_dirty_indicator.nextSibling.click();
+  }
+  gradioApp().querySelectorAll('#settings > .tab-content > .tabitem').forEach((elem) => {
+    if (elem.id === 'settings_tab_licenses' || elem.id === 'settings_show_all_pages') return;
+    elem.style.display = 'block';
+  });
+}
+
+onAfterUiUpdate(() => {
   sort_ui_elements();
   if (Object.keys(opts).length !== 0) return;
   const json_elem = gradioApp().getElementById('settings_json');
@@ -217,7 +253,7 @@ onUiUpdate(() => {
   json_elem.parentElement.style.display = 'none';
   const textarea = json_elem.querySelector('textarea');
   const jsdata = textarea.value;
-  opts = JSON.parse(jsdata);
+  updateOpts(jsdata);
   executeCallbacks(optionsChangedCallbacks);
   register_drag_drop();
 
@@ -226,7 +262,7 @@ onUiUpdate(() => {
       const valueProp = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value');
       const oldValue = valueProp.get.call(textarea);
       valueProp.set.call(textarea, newValue);
-      if (oldValue !== newValue) opts = JSON.parse(textarea.value);
+      if (oldValue !== newValue) updateOpts(textarea.value);
       executeCallbacks(optionsChangedCallbacks);
     },
     get() {
@@ -250,28 +286,19 @@ onUiUpdate(() => {
   registerTextarea('txt2img_neg_prompt', 'txt2img_negative_token_counter', 'txt2img_negative_token_button');
   registerTextarea('img2img_prompt', 'img2img_token_counter', 'img2img_token_button');
   registerTextarea('img2img_neg_prompt', 'img2img_negative_token_counter', 'img2img_negative_token_button');
-  const show_all_pages = gradioApp().getElementById('settings_show_all_pages');
-  const settings_tabs = gradioApp().querySelector('#settings div');
-  if (show_all_pages && settings_tabs) {
-    settings_tabs.appendChild(show_all_pages);
-    show_all_pages.onclick = () => {
-      gradioApp().querySelectorAll('#settings > div').forEach((elem) => {
-        elem.style.display = 'block';
-      });
-    };
-  }
+
   const settings_search = gradioApp().querySelectorAll('#settings_search > label > textarea')[0];
   settings_search.oninput = (e) => {
     setTimeout(() => {
-      gradioApp().querySelectorAll('#settings > div').forEach((elem) => {
-        if (elem.id === 'settings_tab_licenses') return;
-        elem.style.display = 'block';
-      });
+      showAllSettings();
       gradioApp().querySelectorAll('#tab_settings .tabitem').forEach((section) => {
-        section.querySelectorAll('.block').forEach((setting) => {
+        section.querySelectorAll('.dirtyable').forEach((setting) => {
           const visible = setting.innerText.toLowerCase().includes(e.target.value.toLowerCase()) || setting.id.toLowerCase().includes(e.target.value.toLowerCase());
-          if (setting.parentElement.classList.contains('form')) setting.parentElement.style.display = visible ? 'flex' : 'none';
-          else setting.style.display = visible ? 'block' : 'none';
+          if (!visible) {
+            setting.style.display = 'none'
+          } else {
+            setting.style.removeProperty('display')
+          }
         });
       });
     }, 50);
@@ -289,6 +316,86 @@ onOptionsChanged(() => {
     elem.href = `https://google.com/search?q=${sd_checkpoint_hash}`;
   }
 });
+
+onOptionsChanged(function(){
+    let setting_elems = gradioApp().querySelectorAll('#settings [id^="setting_"]')
+    setting_elems.forEach(function(elem){
+        setting_name = elem.id.replace("setting_", "")
+        markIfModified(setting_name, opts[setting_name])
+    })
+})
+
+onUiLoaded(function(){
+    let tab_nav_element = gradioApp().querySelector('#settings > .tab-nav')
+    let tab_nav_buttons = gradioApp().querySelectorAll('#settings > .tab-nav > button')
+    let tab_elements = gradioApp().querySelectorAll('#settings > div:not(.tab-nav)')
+
+    // HACK Add mutation observer to keep gradio from closing setting tabs when showing all pages
+    const observer = new MutationObserver(function(mutations) {
+        const show_all_pages_dummy = gradioApp().getElementById('settings_show_all_pages')
+        if (show_all_pages_dummy.style.display == "none") 
+            return;
+        function mutation_on_style(mut) {
+            return mut.type === 'attributes' && mut.attributeName === 'style'
+        }
+        if (mutations.some(mutation_on_style)) {
+            showAllSettings();
+        }
+    })
+
+    // Add a wrapper for the tab content (everything but the tab nav)
+    const tab_content_wrapper = document.createElement('div')
+    tab_content_wrapper.className = "tab-content"
+    tab_nav_element.parentElement.insertBefore(tab_content_wrapper, tab_nav_element.nextSibling)
+
+    tab_elements.forEach(function(elem, index){
+        // Move the modification indicator to the toplevel tab button
+        let tab_name = elem.id.replace("settings_", "")
+        let indicator = gradioApp().getElementById("modification_indicator_"+tab_name)
+        tab_nav_element.insertBefore(indicator, tab_nav_buttons[index])
+
+        // Add the tab content to the wrapper
+        tab_content_wrapper.appendChild(elem)
+
+        // Add the mutation observer to the tab element
+        observer.observe(elem, { attributes: true, attributeFilter: ['style'] })
+    })
+})
+
+function markIfModified(setting_name, value) {
+    let elem = gradioApp().getElementById("modification_indicator_"+setting_name)
+    if(elem == null) return;
+    // Use JSON.stringify to compare nested objects (e.g. arrays for checkbox-groups)
+    let previous_value_json = JSON.stringify(opts[setting_name])
+    let changed_value = JSON.stringify(value) != previous_value_json
+    if (changed_value) {
+        elem.title = `Click to revert to previous value: ${previous_value_json}`
+    }
+
+    is_unsaved = !opts_metadata[setting_name].is_stored
+    if (is_unsaved) {
+        elem.title = 'Default value (not saved to config)';
+    }
+    elem.disabled = !(is_unsaved || changed_value)
+    elem.classList.toggle('changed', changed_value)
+    elem.classList.toggle('unsaved', is_unsaved)
+
+    let tab_name = opts_metadata[setting_name].tab_name
+    let changed_items = (opts_tabs[tab_name].changed ||= new Set())
+    changed_value ? changed_items.add(setting_name) : changed_items.delete(setting_name)
+    let unsaved = opts_tabs[tab_name].unsaved_keys
+
+    // Set the indicator on the tab nav element
+    let tab_nav_indicator = gradioApp().getElementById('modification_indicator_'+tab_name)
+    tab_nav_indicator.disabled = (changed_items.size == 0) && (unsaved.size == 0)
+    tab_nav_indicator.title = '';
+    tab_nav_indicator.classList.toggle('changed', changed_items.size > 0)
+    tab_nav_indicator.classList.toggle('unsaved', unsaved.size > 0)
+    if (changed_items.size > 0)
+        tab_nav_indicator.title += `Click to reset ${changed_items.size} unapplied change${changed_items.size > 1 ? 's': ''} in this tab.\n`
+    if (unsaved.size > 0)
+        tab_nav_indicator.title += `${unsaved.size} new default value${unsaved.size > 1 ? 's':''} (not yet saved).`;
+}
 
 let txt2img_textarea;
 let img2img_textarea;
@@ -411,10 +518,10 @@ function preview_theme() {
   if (name === 'black-orange' || name.startsWith('gradio/')) {
     const el = document.getElementById('theme-preview') || create_theme_element();
     el.style.display = el.style.display === 'block' ? 'none' : 'block';
-    if (name === 'black-orange') el.src = '/file=javascript/black-orange.jpg';
-    else el.src = `/file=javascript/${name.replace('/', '-')}.jpg`;
+    if (name === 'black-orange') el.src = '/file=html/black-orange.jpg';
+    else el.src = `/file=html/${name.replace('/', '-')}.jpg`;
   } else {
-    fetch('/file=javascript/themes.json')
+    fetch('/file=html/themes.json')
       .then((r) => r.json())
       .then((themes) => {
         const theme = themes.find((t) => t.id === name);
@@ -423,22 +530,22 @@ function preview_theme() {
   }
 }
 
+let uiLoaded = false;
+
 function reconnect_ui() {
   const api_logo = Array.from(gradioApp().querySelectorAll('img')).filter((el) => el?.src?.endsWith('api-logo.svg'));
   if (api_logo.length > 0) api_logo[0].remove();
 
-  const el1 = gradioApp().getElementById('txt2img_gallery_container');
-  const el2 = gradioApp().getElementById('txt2img_gallery');
+  const gallery = gradioApp().getElementById('txt2img_gallery');
   const task_id = localStorage.getItem('task');
-  if (!el1 || !el2) return;
+  if (!gallery) return;
   clearInterval(start_check);
   if (task_id) {
     console.debug('task check:', task_id);
     rememberGallerySelection('txt2img_gallery');
-    showSubmitButtons('txt2img', false);
-    const atEnd = () => showSubmitButtons('txt2img', true);
-    requestProgress(task_id, el1, el2, atEnd, null, true);
+    requestProgress(task_id, null, gallery, null, null, true);
   }
+  uiLoaded = true;
 
   const sd_model = gradioApp().getElementById('setting_sd_model_checkpoint');
   let loadingStarted = 0;
