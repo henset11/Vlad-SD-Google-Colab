@@ -13,8 +13,10 @@
     "comma_padding_backtrack": 20,
     "sd_disable_ckpt": false,
     "sd_backend": "original",
-    "cross_attention_optimization": "Scaled-Dot-Product",
-    "cross_attention_options": [],
+    "cross_attention_optimization": "xFormers",
+    "cross_attention_options": [
+        "xFormers enable flash Attention"
+    ],
     "sub_quad_q_chunk_size": 512,
     "sub_quad_kv_chunk_size": 512,
     "sub_quad_chunk_threshold": 80,
@@ -359,7 +361,7 @@
     "artuitw_settings2promptswidth": false,
     "artuitw_settings2promptsXratio": 1,
     "artuitw_galleryheightVH": 80,
-    "additional_networks_extra_lora_path": "/content/automatic/models/LoRA-LyCORIS",
+    "additional_networks_extra_lora_path": "/content/automatic/models/Lora",
     "additional_networks_sort_models_by": "name",
     "additional_networks_reverse_sort_order": false,
     "additional_networks_model_name_filter": "",
