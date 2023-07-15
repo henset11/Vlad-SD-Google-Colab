@@ -13,10 +13,8 @@
     "comma_padding_backtrack": 20,
     "sd_disable_ckpt": false,
     "sd_backend": "original",
-    "cross_attention_optimization": "xFormers",
-    "cross_attention_options": [
-        "xFormers enable flash Attention"
-    ],
+    "cross_attention_optimization": "Scaled-Dot-Product",
+    "cross_attention_options": [],
     "sub_quad_q_chunk_size": 512,
     "sub_quad_kv_chunk_size": 512,
     "sub_quad_chunk_threshold": 80,
