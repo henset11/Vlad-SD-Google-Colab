@@ -1,6 +1,6 @@
 {
     "sd_checkpoint_autoload": true,
-    "sd_model_checkpoint": "DreamShaper_6_NoVae_pruned.safetensors",
+    "sd_model_checkpoint": "DreamShaper_7_pruned.safetensors [ed989d673d]",
     "sd_model_refiner": "None",
     "sd_checkpoint_cache": 0,
     "sd_vae_checkpoint_cache": 0,
@@ -57,8 +57,8 @@
     "ckpt_dir": "/content/automatic/models/Stable-diffusion",
     "diffusers_dir": "/content/automatic/models/Diffusers",
     "vae_dir": "/content/automatic/models/VAE",
-    "lora_dir": "/content/automatic/models/LoRA-LyCORIS",
-    "lyco_dir": "/content/automatic/models/LoRA-LyCORIS",
+    "lora_dir": "/content/automatic/models/Lora",
+    "lyco_dir": "/content/automatic/models/LyCORIS",
     "styles_dir": "/content/automatic/styles.csv",
     "embeddings_dir": "/content/automatic/models/embeddings",
     "hypernetwork_dir": "/content/automatic/models/hypernetworks",
@@ -191,7 +191,7 @@
     "always_discard_next_to_last_sigma": false,
     "uni_pc_variant": "bh1",
     "uni_pc_skip_type": "time_uniform",
-    "uni_pc_order": 3,
+    "uni_pc_order": 2,
     "uni_pc_lower_order_final": true,
     "postprocessing_enable_in_main_ui": [],
     "postprocessing_operation_order": [],
@@ -257,9 +257,9 @@
         "stable-diffusion-webui-images-browser"
     ],
     "disable_all_extensions": "none",
-    "sd_checkpoint_hash": null,
-    "clip_skip": 2,
-    "sd_checkpoint": "DreamShaper_6_NoVae_pruned.safetensors",
+    "sd_checkpoint_hash": "ed989d673dbf0153d1cd16994c1bfa27a0f13de1e60665aabcb99334ca5b78e9",
+    "clip_skip": 1,
+    "sd_checkpoint": "DreamShaper_7_pruned.safetensors",
     "ldsr_steps": 100,
     "ldsr_cached": false,
     "SWIN_tile": 192,
@@ -398,5 +398,16 @@
     "deforum_save_gen_info_as_srt_params": [
         "Noise Schedule"
     ],
-    "def_img_cfg": "1.5"
+    "def_img_cfg": "1.5",
+    "theme_style": "Auto",
+    "schedulers_solver_order": 2,
+    "schedulers_sep_diffusers": "<h2>Diffusers specific config</h2>",
+    "schedulers_prediction_type": "default",
+    "schedulers_beta_schedule": "default",
+    "schedulers_use_karras": true,
+    "schedulers_use_loworder": true,
+    "schedulers_use_thresholding": false,
+    "schedulers_dpm_solver": "sde-dpmsolver++",
+    "schedulers_sep_kdiffusers": "<h2>K-Diffusion specific config</h2>",
+    "schedulers_sep_compvis": "<h2>CompVis specific config</h2>"
 }
