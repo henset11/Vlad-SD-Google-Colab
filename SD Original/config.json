@@ -1,6 +1,6 @@
 {
-    "sd_checkpoint_autoload": true,
-    "sd_model_checkpoint": "DreamShaper_7_pruned.safetensors [ed989d673d]",
+    "sd_checkpoint_autoload": false,
+    "sd_model_checkpoint": "DreamShaper_7_pruned.safetensors",
     "sd_model_refiner": "None",
     "sd_checkpoint_cache": 0,
     "sd_vae_checkpoint_cache": 0,
@@ -253,12 +253,10 @@
     "extra_networks_add_text_separator": " ",
     "extra_networks_default_multiplier": 1.0,
     "sd_hypernetwork": "None",
-    "disabled_extensions": [
-        "stable-diffusion-webui-images-browser"
-    ],
+    "disabled_extensions": [],
     "disable_all_extensions": "none",
-    "sd_checkpoint_hash": "ed989d673dbf0153d1cd16994c1bfa27a0f13de1e60665aabcb99334ca5b78e9",
-    "clip_skip": 1,
+    "sd_checkpoint_hash": null,
+    "clip_skip": 2,
     "sd_checkpoint": "DreamShaper_7_pruned.safetensors",
     "ldsr_steps": 100,
     "ldsr_cached": false,

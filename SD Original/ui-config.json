@@ -4454,5 +4454,17 @@
     "img2img/Denoise end/value": 1.0,
     "img2img/Denoise end/minimum": 0.0,
     "img2img/Denoise end/maximum": 1.0,
-    "img2img/Denoise end/step": 0.05
+    "img2img/Denoise end/step": 0.05,
+    "txt2img/Secondary sampler/visible": true,
+    "txt2img/Secondary sampler/value": "UniPC",
+    "txt2img/Secondary steps/visible": true,
+    "txt2img/Secondary steps/value": 20,
+    "txt2img/Secondary steps/minimum": 0,
+    "txt2img/Secondary steps/maximum": 99,
+    "txt2img/Secondary steps/step": 1,
+    "txt2img/Secondary CFG Scale/visible": true,
+    "txt2img/Secondary CFG Scale/value": 6.0,
+    "txt2img/Secondary CFG Scale/minimum": 1.0,
+    "txt2img/Secondary CFG Scale/maximum": 30.0,
+    "txt2img/Secondary CFG Scale/step": 0.1
 }
