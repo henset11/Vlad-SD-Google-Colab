@@ -130,11 +130,12 @@
     "keyedit_precision_extra": 0.05,
     "keyedit_delimiters": ".,\\/!?%^*;:{}=`~()",
     "quicksettings_list": [
-        "sd_model_checkpoint",
-        "sd_vae",
-        "sd_model_refiner",
-        "initial_noise_multiplier"
-    ],
+    "sd_model_checkpoint",
+    "sd_vae",
+    "sd_model_refiner",
+    "initial_noise_multiplier",
+    "samples_format"
+	],
     "hidden_tabs": [],
     "ui_tab_reorder": "From Text, From Image, Process Image, Infinite image browsing",
     "ui_scripts_reorder": "Enable Dynamic Thresholding, ControlNet",
@@ -254,7 +255,9 @@
     "extra_networks_default_multiplier": 1.0,
     "sd_hypernetwork": "None",
     "disabled_extensions": [
-        "sd-webui-agent-scheduler"
+        "sd-webui-agent-scheduler",
+		"clip-interrogator-ext",
+		"sd-extension-system-info"
 	],
     "disable_all_extensions": "none",
     "sd_checkpoint_hash": null,
