@@ -115,7 +115,6 @@
     "sd-webui-agent-scheduler",
     "clip-interrogator-ext",
     "sd-extension-system-info",
-    "sd-webui-controlnet",
     "Lora"
   ],
   "sd_checkpoint_hash": null,
